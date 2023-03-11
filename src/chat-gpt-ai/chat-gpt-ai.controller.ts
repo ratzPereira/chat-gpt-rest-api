@@ -10,7 +10,7 @@ export class ChatGptAiController {
   @Post('/message')
   @UsePipes(ValidationPipe)
   getModelAnswer(@Body() data: ModelAnswer) {
-    return this.chatGptAiService.getModelAnswer(data.question);
+    return this.chatGptAiService.getModelAnswer(data);
   }
 
   @Get()

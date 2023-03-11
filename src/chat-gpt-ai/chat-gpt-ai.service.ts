@@ -1,14 +1,16 @@
+import { ModelAnswer } from './model/model.answer';
 import { Injectable } from '@nestjs/common';
 import { Configuration } from 'openai';
 import { CreateCompletionRequest, OpenAIApi } from 'openai/dist/api';
 
 const DEFAULT_MODEL_ID = 'text-davinci-003';
 const DEFAULT_TEMPERATURE = 0.9;
-
+const MAX_TOKENS = 200;
 @Injectable()
 export class ChatGptAiService {
   private readonly openAiAPI: OpenAIApi;
   private selectedModelId: string | undefined;
+
 
   constructor() {
     const configuration = new Configuration({
@@ -29,13 +31,23 @@ export class ChatGptAiService {
     return models.data;
   }
 
-  async getModelAnswer(question: string, temperature?: number) {
+  async getModelAnswer(input: ModelAnswer) {
     try {
+      const { temperature, modelId, question } = input;
+
+      let model = DEFAULT_MODEL_ID;
+      if (modelId) {
+        model = modelId;
+      } else if (this.selectedModelId) {
+        model = this.selectedModelId;
+      }
+
       const params: CreateCompletionRequest = {
         prompt: question,
-        model: this.selectedModelId ? this.selectedModelId : DEFAULT_MODEL_ID,
+        model,
         temperature:
           temperature != undefined ? temperature : DEFAULT_TEMPERATURE,
+          max_tokens:MAX_TOKENS
       };
 
       const response = await this.openAiAPI.createCompletion(params);
