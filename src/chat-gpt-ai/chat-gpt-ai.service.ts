@@ -29,6 +29,11 @@ export class ChatGptAiService {
 
       const response = await this.openAiAPI.createCompletion(params);
 
+      const { data } = response;
+
+      if (data.choices.length) {
+        return data.choices;
+      }
       return response.data;
     } catch (error) {}
   }
