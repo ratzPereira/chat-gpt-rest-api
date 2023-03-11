@@ -8,6 +8,7 @@ const DEFAULT_TEMPERATURE = 0.9;
 @Injectable()
 export class ChatGptAiService {
   private readonly openAiAPI: OpenAIApi;
+  private selectedModelId: string | undefined;
 
   constructor() {
     const configuration = new Configuration({
@@ -18,11 +19,21 @@ export class ChatGptAiService {
     this.openAiAPI = new OpenAIApi(configuration);
   }
 
+  setModelId(modelId: string) {
+    this.selectedModelId = modelId;
+  }
+
+  async listModels() {
+    const models = await this.openAiAPI.listModels();
+
+    return models.data;
+  }
+
   async getModelAnswer(question: string, temperature?: number) {
     try {
       const params: CreateCompletionRequest = {
         prompt: question,
-        model: DEFAULT_MODEL_ID,
+        model: this.selectedModelId ? this.selectedModelId : DEFAULT_MODEL_ID,
         temperature:
           temperature != undefined ? temperature : DEFAULT_TEMPERATURE,
       };
